@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware("auth");
+    }
     /**
      * Display a listing of the resource.
      */
@@ -20,7 +26,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view("posts.create");
     }
 
     /**
@@ -28,7 +34,16 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            "description" => "required",
+            "image" => ["required", "mimes:jpg,jpeg,png,gif"]
+        ]);
+
+        $image = $request["image"]->store("posts", "public");
+        $data["image"] = $image;
+        $data["slug"] = Str::random(10);
+        auth()->user()->posts()->create($data);
+        return redirect()->to("/");
     }
 
     /**
