@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return Post::all();
 });
 
 Route::get('/dashboard', function () {
@@ -33,3 +35,5 @@ require __DIR__ . '/auth.php';
 
 Route::get("p/create", [PostController::class, "create"])->name("post_create");
 Route::post("p/create", [PostController::class, "store"])->name("store_post");
+Route::get("p/{post:slug}", [PostController::class, "show"])->name("show_post");
+Route::post("p/{post:slug}/comment", [CommentController::class, "store"])->name("store_comment");
