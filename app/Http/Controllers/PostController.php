@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -11,7 +12,7 @@ class PostController extends Controller
 
     public function __construct()
     {
-        $this->middleware("auth");
+        $this->middleware("auth")->except("show");
     }
     /**
      * Display a listing of the resource.
@@ -43,7 +44,7 @@ class PostController extends Controller
         $data["image"] = $image;
         $data["slug"] = Str::random(10);
         auth()->user()->posts()->create($data);
-        return redirect()->to("/");
+        return redirect()->route("show_post", ["post" => $data["slug"]]);
     }
 
     /**
@@ -51,7 +52,6 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-
         return view("posts.show", compact("post"));
     }
 
@@ -60,7 +60,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view("posts.edit", compact("post"));
     }
 
     /**
@@ -68,7 +68,20 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+
+        $data = $request->validate([
+            "description" => ["required"],
+            "image" => ["nullable", "mimes:jpg,jpeg,png,gif"]
+        ]);
+
+        if ($request->has("image")) {
+            $image = $request["image"]->store("posts", "public");
+            $data["image"] = $image;
+            Storage::delete("public/" . $post->image);
+        }
+
+        $post->update($data);
+        return redirect()->route("show_post", ["post" => $post]);
     }
 
     /**
@@ -76,6 +89,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        if(!is_null($post))
+        {
+            Storage::delete("public/" . $post->image);
+            $post->delete();
+        }
+        return redirect("/");
+
     }
 }

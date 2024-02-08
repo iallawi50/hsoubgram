@@ -17,11 +17,28 @@
 
             <div class="border b-2">
                 <div class="flex items-center p-5">
-                    <img src="{{ $post->owner->image }}" alt="{{ $post->owner->username }}"
-                        class="mr-5 h-10 w-10 rounded-full">
-                    <div>
-                        <a href="{{ $post->owner->username }}" class="font-bold">{{ $post->owner->username }}</a>
-                        <p>{{ $post->description }}</p>
+                    <div class="flex items-center grow">
+                        <img src="{{ $post->owner->image }}" alt="{{ $post->owner->username }}"
+                            class="mr-5 h-10 w-10 rounded-full">
+                        <div>
+                            <a href="{{ $post->owner->username }}" class="font-bold">{{ $post->owner->username }}</a>
+                            <p>{{ $post->description }}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        @if (auth()->id() == $post->owner->id)
+                            <a href="{{ route('post_edit', ['post' => $post->slug]) }}"><i
+                                    class='bx bx-message-square-edit text-yellow-600 text-3xl'></i></a>
+
+                            <form action="{{ route('delete_post', ['post' => $post->slug]) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit">
+                                    <i class='bx bx-trash text-red-600 text-3xl'
+                                        onclick="return confirm('are you sure ?')"></i>
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>
