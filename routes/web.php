@@ -21,9 +21,9 @@ Route::get('/', function () {
     return Post::all();
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', function () {
+    return Post::all();
+})->name("dashboard");
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -33,10 +33,15 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-Route::get("p/create", [PostController::class, "create"])->name("post_create");
-Route::post("p/create", [PostController::class, "store"])->name("store_post");
-Route::get("p/{post:slug}", [PostController::class, "show"])->name("show_post");
+Route::controller(PostController::class)->group(function () {
+    Route::get("/", "index")->name("home_page");
+    Route::get("/explore", "explore")->name("explore");
+    Route::get("p/create", "create")->name("post_create");
+    Route::post("p/create", "store")->name("store_post");
+    Route::get("p/{post:slug}", "show")->name("show_post");
+    Route::get("p/{post:slug}/edit", "edit")->name("post_edit");
+    Route::patch("p/{post:slug}/edit", "update")->name("post_update");
+    Route::delete("p/{post:slug}/delete", "destroy")->name("delete_post");
+});
+
 Route::post("p/{post:slug}/comment", [CommentController::class, "store"])->name("store_comment");
-Route::get("p/{post:slug}/edit", [PostController::class, "edit"])->name("post_edit");
-Route::patch("p/{post:slug}/edit", [PostController::class, "update"])->name("post_update");
-Route::delete("p/{post:slug}/delete", [PostController::class, "destroy"])->name("delete_post");

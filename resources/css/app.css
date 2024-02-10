@@ -6,6 +6,10 @@
     .card {
         @apply flex flex-col bg-white my-4 rounded-xl border border-gray-200;
     }
+
+    .card-header {
+        @apply flex flex-row items-center p-5;
+    }
 }
 
 @layer utilities {

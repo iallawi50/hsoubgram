@@ -12,14 +12,17 @@ class PostController extends Controller
 
     public function __construct()
     {
-        $this->middleware("auth")->except("show");
+        $this->middleware("auth")->except("show", "explore");
     }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return view("posts.index", [
+            "posts" => Post::all(),
+            "suggested_users" => auth()->user()->suggested_users(),
+        ]);
     }
 
     /**
@@ -89,12 +92,20 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        if(!is_null($post))
-        {
+        if (!is_null($post)) {
             Storage::delete("public/" . $post->image);
             $post->delete();
         }
         return redirect("/");
+    }
 
+    public function explore()
+    {
+
+        $posts = Post::whereRelation("owner", "private_account", "=", 0)
+            ->whereNot("user_id", auth()->id())
+            ->simplePaginate(12);
+
+        return view("posts.explore", compact("posts"));
     }
 }

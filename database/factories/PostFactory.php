@@ -17,8 +17,13 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
+        $imgs = [
+            "posts/1lOoA146xVUvabIbvSD2Cp2shDuvonwPRsifPsV3.jpg",
+            "posts/hE0OkI5xN5s105QbQTdUKz3YRFEepSpClkdTiSFF.jpg",
+            "posts/4S8QaiJ5CCHamjAzv1awJyj45cZ88hXgBVtKERTB.png"
+        ];
         return [
-            "image" => "https://via.placeholder.com/600x600/",
+            "image" => fake()->randomElement($imgs),
             "description" => fake()->sentence(),
             "slug" => fake()->regexify("[A-Za-z0-9]{10}"),
             // "user_id" => User::factory(),
